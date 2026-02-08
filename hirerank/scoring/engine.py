@@ -208,9 +208,10 @@ def compute_score(
                 "github_code_quality",
                 "documentation_quality",
                 "engineering_practices",
-                "project_originality",
             ]
         )
+        if originality_score is not None:
+            available_categories.append("project_originality")
     else:
         components.extend(
             [
