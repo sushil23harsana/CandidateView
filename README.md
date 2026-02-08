@@ -105,6 +105,48 @@ MODE 2: IMPORT EXISTING DATA
 Best for: Already collected applications elsewhere
 ```
 
+## 2.1 CSV Candidate Import (API)
+
+HireRank supports async CSV candidate imports for a specific job. The flow is:
+
+1) Upload a CSV for preview to read headers and sample rows.
+2) Provide a column mapping (CSV columns → candidate fields).
+3) Start the import job (queued → processing → completed/failed).
+4) Poll the import job for per-row success/failure results.
+
+### Required CSV Columns
+At minimum, map columns for `name` and `email`. Optional mappings include:
+`skills`, `github_url`, `resume_url`, `status`, `experience_years`, and
+`required_experience_years`.
+
+### Example CSV
+```csv
+Full Name,Email,Skills,GitHub,Status
+Alex Johnson,alex@example.com,"Python, FastAPI, Postgres",https://github.com/alexj,new
+Jordan Lee,jordan@example.com,"React; TypeScript",https://github.com/jordanlee,shortlisted
+```
+
+### Preview Endpoint
+```bash
+curl -X POST \"http://localhost:8000/dashboard/jobs/123/imports/preview?preview_rows=5\" \\
+  -H \"X-Owner-Id: owner-abc\" \\
+  -F \"file=@/path/to/candidates.csv\"
+```
+
+### Start Import Job
+```bash
+curl -X POST \"http://localhost:8000/dashboard/jobs/123/imports\" \\
+  -H \"X-Owner-Id: owner-abc\" \\
+  -F \"file=@/path/to/candidates.csv\" \\
+  -F 'mapping={\"name\":\"Full Name\",\"email\":\"Email\",\"skills\":\"Skills\",\"github_url\":\"GitHub\",\"status\":\"Status\"}'
+```
+
+### Check Import Status
+```bash
+curl \"http://localhost:8000/dashboard/jobs/123/imports/{import_id}\" \\
+  -H \"X-Owner-Id: owner-abc\"
+```
+
 ## 3. User Types & Personas
 
 ### User Type 1: Hiring Manager / Founder
