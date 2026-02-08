@@ -138,6 +138,7 @@ def compute_score(
     config: ScoringConfig,
     resume: Optional[ResumeAnalysis] = None,
     github: Optional[GitHubAnalysis] = None,
+    owner_id: Optional[str] = None,
 ) -> ScoreResult:
     normalized_config = config.normalized()
     weights = normalized_config.category_weights
@@ -279,4 +280,5 @@ def compute_score(
         total_score=total_score,
         breakdown=ScoreBreakdown(components=components),
         explanation=explanation,
+        owner_id=owner_id,
     )
