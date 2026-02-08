@@ -995,6 +995,15 @@ CATEGORY                        WEIGHT      MAX POINTS
 TOTAL                           100%        100 points
 ```
 
+### Scoring Engine Implementation (Current)
+- **Configurable per job:** Category weights and resume sub-weights are stored per job and normalized to 100%. Each job can override defaults without changing code.  
+- **Inputs:** Resume analysis (skills match + experience fit) and GitHub analysis (code quality, documentation, engineering practices, project originality).  
+- **Normalization:** Category scores are normalized to a 0–100 scale. If a category is missing (e.g., no GitHub), the total score is re-weighted across available categories while keeping missing categories in the breakdown with an explanation.  
+- **Project originality detection:** Uses GitHub project signals (tutorial indicators, green flags) to compute an average originality score and explanation.  
+- **Human-readable explanations:** Each category produces a short explanation, and the final output concatenates them into a candidate scoring summary.  
+- **Persistence:** The scoring job saves the total score, per-category breakdown, and explanation text in a scoring results store.  
+- **Background job triggers:** Scoring runs once resume parsing completes and GitHub analysis finishes (or GitHub is missing and not required). The scoring engine is not exposed via API yet.  
+
 ### GitHub Analysis Logic
 ```python
 class GitHubAnalyzer:
