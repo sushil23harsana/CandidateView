@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutGrid, ListChecks } from "lucide-react";
+import { LayoutGrid, ListChecks, UploadCloud } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +14,11 @@ const navigation = [
     name: "Insights",
     href: "/insights",
     icon: LayoutGrid
+  },
+  {
+    name: "Import CSV",
+    href: "/imports",
+    icon: UploadCloud
   }
 ];
 
