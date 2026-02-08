@@ -1261,6 +1261,73 @@ def detect_tutorial_project(repo_analysis: dict) -> dict:
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
+### Hiring Manager Dashboard APIs (Read-only)
+All dashboard endpoints are **owner-scoped** via the `X-Owner-Id` header. The dashboard phase is read-only and does not support write actions yet.
+
+**List ranked candidates for a job (with filters)**
+```
+GET /dashboard/jobs/{job_id}/candidates?min_score=75&status=shortlisted&skill=Python&skill=FastAPI
+X-Owner-Id: owner_123
+```
+
+Example response:
+```json
+{
+  "job_id": "job_456",
+  "owner_id": "owner_123",
+  "candidates": [
+    {
+      "application_id": "app_001",
+      "candidate_id": "cand_001",
+      "status": "shortlisted",
+      "skills": ["Python", "FastAPI", "PostgreSQL"],
+      "total_score": 91.2,
+      "breakdown": {
+        "resume_skills": {
+          "score": 95.0,
+          "weight": 0.4,
+          "weighted_score": 38.0,
+          "explanation": "Required skills match: 5/5."
+        }
+      },
+      "explanation_summary": "Candidate scoring summary:\n- Resume Skills: Required skills match: 5/5.",
+      "explanation": "Candidate scoring summary:\n- Resume Skills: Required skills match: 5/5.",
+      "score_created_at": "2024-08-01T12:34:56Z"
+    }
+  ]
+}
+```
+
+**Job-level insights**
+```
+GET /dashboard/jobs/{job_id}/insights
+X-Owner-Id: owner_123
+```
+
+Example response:
+```json
+{
+  "job_id": "job_456",
+  "owner_id": "owner_123",
+  "insights": {
+    "total_applications": 120,
+    "scored_applications": 110,
+    "unscored_applications": 10,
+    "score_distribution": [
+      { "label": "0-20", "min_score": 0, "max_score": 20, "count": 5 },
+      { "label": "20-40", "min_score": 20, "max_score": 40, "count": 20 },
+      { "label": "40-60", "min_score": 40, "max_score": 60, "count": 40 },
+      { "label": "60-80", "min_score": 60, "max_score": 80, "count": 30 },
+      { "label": "80-100", "min_score": 80, "max_score": 100, "count": 15 }
+    ],
+    "top_skill_matches": [
+      { "skill": "Python", "count": 64 },
+      { "skill": "FastAPI", "count": 42 }
+    ]
+  }
+}
+```
+
 ## 10. Tech Stack
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
