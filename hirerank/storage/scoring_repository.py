@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 from hirerank.scoring.models import ScoreBreakdown, ScoreComponent, ScoreResult
 
@@ -13,20 +13,37 @@ class ScoringRepository:
         self.storage_path = storage_path
         self.storage_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def save(self, result: ScoreResult) -> None:
+    def save(self, result: ScoreResult, owner_id: Optional[str] = None) -> None:
         data = self._load()
-        job_key = f"{result.job_id}:{result.candidate_id}"
+        resolved_owner = (owner_id or result.owner_id or "").strip() or None
+        if resolved_owner:
+            job_key = f"{resolved_owner}:{result.job_id}:{result.candidate_id}"
+        else:
+            job_key = f"{result.job_id}:{result.candidate_id}"
+        if resolved_owner:
+            result = ScoreResult(
+                candidate_id=result.candidate_id,
+                job_id=result.job_id,
+                total_score=result.total_score,
+                breakdown=result.breakdown,
+                explanation=result.explanation,
+                created_at=result.created_at,
+                owner_id=resolved_owner,
+            )
         data[job_key] = result.as_dict()
         self._write(data)
 
-    def list_by_job(self, job_id: str) -> Dict[str, ScoreResult]:
+    def list_by_job(self, owner_id: str, job_id: str) -> Dict[str, ScoreResult]:
         data = self._load()
         results: Dict[str, ScoreResult] = {}
-        prefix = f"{job_id}:"
+        prefix = f"{owner_id}:{job_id}:"
         for key, payload in data.items():
             if not key.startswith(prefix):
                 continue
             if not isinstance(payload, dict):
+                continue
+            payload_owner = str(payload.get("owner_id", "")).strip()
+            if payload_owner and payload_owner != owner_id:
                 continue
             candidate_id = str(payload.get("candidate_id", "")).strip()
             if not candidate_id:
@@ -57,6 +74,7 @@ class ScoringRepository:
                 created_at=datetime.fromisoformat(payload.get("created_at"))
                 if payload.get("created_at")
                 else datetime.utcnow(),
+                owner_id=payload_owner or owner_id,
             )
         return results
 

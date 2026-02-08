@@ -52,7 +52,7 @@ def list_candidates_for_job(
                 continue
         filtered_apps.append(application)
 
-    scores_by_candidate = scoring_repo.list_by_job(job_id=job_id)
+    scores_by_candidate = scoring_repo.list_by_job(owner_id=owner_id, job_id=job_id)
     entries: List[CandidateDashboardEntry] = []
     for application in filtered_apps:
         score = scores_by_candidate.get(application.candidate_id)
@@ -84,7 +84,7 @@ def job_insights(
     scoring_repo: ScoringRepository,
 ) -> JobInsights:
     applications = applications_repo.list_by_job(owner_id=owner_id, job_id=job_id)
-    scores_by_candidate = scoring_repo.list_by_job(job_id=job_id)
+    scores_by_candidate = scoring_repo.list_by_job(owner_id=owner_id, job_id=job_id)
 
     scores = [
         scores_by_candidate[application.candidate_id].total_score

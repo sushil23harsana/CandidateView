@@ -37,10 +37,11 @@ class ScoreResult:
     total_score: float
     breakdown: ScoreBreakdown
     explanation: str
+    owner_id: Optional[str] = None
     created_at: datetime = field(default_factory=datetime.utcnow)
 
     def as_dict(self) -> Dict[str, object]:
-        return {
+        payload = {
             "candidate_id": self.candidate_id,
             "job_id": self.job_id,
             "total_score": self.total_score,
@@ -48,3 +49,6 @@ class ScoreResult:
             "explanation": self.explanation,
             "created_at": self.created_at.isoformat(),
         }
+        if self.owner_id:
+            payload["owner_id"] = self.owner_id
+        return payload
